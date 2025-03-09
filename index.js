@@ -19,18 +19,25 @@ if (!fs.existsSync(options.input)) {
     process.exit(1);
 }
 
-// Якщо нічого не виводимо, просто завершуємо програму
-if (!options.output && !options.display) {
-    process.exit(0);
+// Читання JSON-файлу
+const rawData = fs.readFileSync(options.input, 'utf8');
+let jsonData;
+try {
+    jsonData = JSON.parse(rawData);
+} catch (error) {
+    console.error('Invalid JSON format');
+    process.exit(1);
 }
 
-// Читання JSON-файлу
-const data = fs.readFileSync(options.input, 'utf8');
-console.log('Файл успішно прочитаний');
+// Фільтрація потрібних категорій
+const result = jsonData
+    .filter(entry => entry.indicator === 'Доходи, усього' || entry.indicator === 'Витрати, усього')
+    .map(entry => `${entry.indicator}:${entry.value}`)
+    .join('\n');
 
 if (options.output) {
-    fs.writeFileSync(options.output, data);
+    fs.writeFileSync(options.output, result);
 }
 if (options.display) {
-    console.log(data);
+    console.log(result);
 }
