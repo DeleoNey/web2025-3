@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/DeleoNey/web2025-3/issues"
   },
-  "homepage": "https://github.com/DeleoNey/web2025-3#readme"
+  "homepage": "https://github.com/DeleoNey/web2025-3#readme",
+  "dependencies": {
+    "commander": "^13.1.0"
+  }
 }
