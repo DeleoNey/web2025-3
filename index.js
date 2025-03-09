@@ -1,26 +1,7 @@
-const { program } = require('commander');
 const fs = require('fs');
 
-program
-    .requiredOption('-i, --input <path>', 'Input file path')
-    .option('-o, --output <path>', 'Output file path')
-    .option('-d, --display', 'Display output in console');
-
-program.parse(process.argv);
-const options = program.opts();
-
-if (!options.input) {
-    console.error('Please, specify input file');
-    process.exit(1);
-}
-
-if (!fs.existsSync(options.input)) {
-    console.error('Cannot find input file');
-    process.exit(1);
-}
-
-// Читання JSON-файлу
-const rawData = fs.readFileSync(options.input, 'utf8');
+// Зчитуємо JSON з файлу
+const rawData = fs.readFileSync('data.json', 'utf8');
 let jsonData;
 try {
     jsonData = JSON.parse(rawData);
@@ -29,15 +10,13 @@ try {
     process.exit(1);
 }
 
-// Фільтрація потрібних категорій
-const result = jsonData
-    .filter(entry => entry.indicator === 'Доходи, усього' || entry.indicator === 'Витрати, усього')
-    .map(entry => `${entry.indicator}:${entry.value}`)
-    .join('\n');
+// Фільтруємо дані по id_api
+const requiredData = jsonData.filter(entry => 
+    entry.id_api === "BS2_IncomeTotal" || entry.id_api === "BS2_ExpensesTotal"
+);
 
-if (options.output) {
-    fs.writeFileSync(options.output, result);
-}
-if (options.display) {
-    console.log(result);
-}
+// Форматування результату
+const result = requiredData.map(entry => `${entry.txt}:${entry.value}`).join('\n');
+
+// Виведення результату в консоль
+console.log(result);
