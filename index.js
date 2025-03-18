@@ -37,27 +37,25 @@ function main() {
   try {
     const jsonData = fs.readFileSync(params.input, 'utf-8');
     const data = JSON.parse(jsonData);
-    
-    const dataArray = Array.isArray(data) ? data : data.data || [];
 
-    const incomeCategory = dataArray.find(item => item.txt === "Доходи, усього");
-    const expenseCategory = dataArray.find(item => item.txt === "Витрати, усього");
+    const dataArray = Array.isArray(data) ? data : [data]; // Переконаємось, що data - це масив
 
-    let result = '';
-    if (incomeCategory) result += `Доходи, усього:${incomeCategory.value}\n`;
-    if (expenseCategory) result += `Витрати, усього:${expenseCategory.value}`;
+    // Фільтруємо доходи та витрати
+    const incomeCategory = dataArray.filter(item => item.parent === "BS2_IncomeTotal");
+    const expenseCategory = dataArray.filter(item => item.parent === "BS2_ExpensesTotal");
 
-    if (!result) {
-      console.error('Не вдалося знайти потрібні категорії в даних');
-      process.exit(1);
-    }
+    // Підсумовуємо значення
+    const totalIncome = incomeCategory.reduce((sum, item) => sum + item.value, 0);
+    const totalExpense = expenseCategory.reduce((sum, item) => sum + item.value, 0);
+
+    const result = `Доходи, усього: ${totalIncome}\nВитрати, усього: ${totalExpense}`;
 
     if (params.display) {
-      console.log(result.trim());
+      console.log(result);
     }
 
     if (params.output) {
-      fs.writeFileSync(params.output, result.trim());
+      fs.writeFileSync(params.output, result);
     }
   } catch (error) {
     console.error('Помилка при обробці файлу:', error.message);
